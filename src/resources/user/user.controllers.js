@@ -1,4 +1,5 @@
 import { User } from './user.model'
+import http from 'http'
 
 export const createUser = async (req, res, next) => {
   const user = await User.create(req.body);
@@ -7,11 +8,11 @@ export const createUser = async (req, res, next) => {
 }
 
 export const getUser = async (req, res, next) => {
-    console.log("getUser")
-    console.log(req.params.id)
     const user = await User.findOne({ _id: req.params.id})
         .exec()
-    if(!user) return next()
+    if(!user){
+      return res.status(400).json({error: http.STATUS_CODES[400]})
+    }
     res.status(200).json({data: user})
     
 }
