@@ -1,9 +1,14 @@
 import { Router } from 'express'
-import { me, updateMe } from './user.controllers'
+import { me, updateMe, createUser, getUser } from './user.controllers'
 
-const router = Router()
+const userRouter = Router()
 
-router.get('/', me)
-router.put('/', updateMe)
+userRouter.
+    route("/:id")
+    .get(getUser)
 
-export default router
+userRouter
+    .route('/')
+    .get(me)
+
+export default userRouter
