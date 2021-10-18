@@ -1,25 +1,51 @@
-import config from '../config'
-import { User } from '../resources/user/user.model'
 import jwt from 'jsonwebtoken'
+import passport from "passport";
+import {Strategy} from "passport-local";
+import autoCatch from './autoCatch';
 
-export const newToken = user => {
-  return jwt.sign({ id: user.id }, config.secrets.jwt, {
-    expiresIn: config.secrets.jwtExp
-  })
+const jwtSecret = process.env.JWT_SECRET || 'mark it zero'
+const adminPassword = process.env.ADMIN_PASSWORD || 'iamthewalrus' 
+const jwtOpts = { algorithm: 'HS256', expiresIn: '30d' }
+
+passport.use(adminStrategy())
+
+export const authenticate = passport.authenticate('local', { session: false })
+
+export const login = async (req, res, next) => {
+    console.log(req)
+    const token = await sign({ username: req.user.username })
+    res.cookie('jwt', token, { httpOnly: true })
+    res.json({ success: true, token: token })
 }
 
-export const verifyToken = token =>
-  new Promise((resolve, reject) => {
-    jwt.verify(token, config.secrets.jwt, (err, payload) => {
-      if (err) return reject(err)
-      resolve(payload)
+async function ensureAdmin (req, res, next) {
+    const jwtString = req.headers.authorization || req.cookies.jwt 
+    const payload = await verify(jwtString)
+    if (payload.username === 'admin') return next()
+    const err = new Error('Unauthorized') 
+    err.statusCode = 401
+    next(err)
+}
+
+async function sign (payload) {
+    console.log(payload, "payload");
+    return jwt.sign(payload, jwtSecret, jwtOpts)
+}
+
+async function verify (jwtString = '') {
+    jwtString = jwtString.replace(/^Bearer /i, '')
+    try {
+        return await jwt.verify(jwtString, jwtSecret)
+    } catch (err) { 
+        err.statusCode = 401
+        throw err
+    }
+}
+
+function adminStrategy () {
+    return new Strategy(function (username, password, cb) {
+        const isAdmin = username === 'admin' && password === adminPassword
+        if (isAdmin) return cb(null, { username: 'admin' })
+        cb(null, false) 
     })
-  })
-
-export const signup = async (req, res) => {}
-
-export const signin = async (req, res) => {}
-
-export const protect = async (req, res, next) => {
-  next()
 }

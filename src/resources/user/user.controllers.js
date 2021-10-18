@@ -1,11 +1,13 @@
 import { User } from './user.model'
 import http from 'http'
 
+
 export const createUser = async (req, res, next) => {
   const user = await User.create(req.body);
-  const { username, email } = user
-  res.json({ username, email })
+  const { username, email, _id } = user
+  res.json({ username, email, _id })
 }
+
 
 export const getUser = async (req, res, next) => {
     const user = await User.findOne({ _id: req.params.id})
