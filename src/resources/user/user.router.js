@@ -1,17 +1,12 @@
 import { Router } from 'express'
 import { me, updateMe, createUser, getUser } from './user.controllers'
-import { ensureAdmin } from '../../middleware/ensure.admin';
-const userRouter = Router()
+import { ensureAdmin } from '../../middleware/ensure.admin'
+const router = Router()
 
-userRouter
-    .route('/createUser')
-    .post(createUser)
+router.route('/createUser').post(createUser)
 
 // userRouter.use(ensureAdmin)
 
-userRouter.
-    route("/:id")
-    .get(getUser)
+router.route('/:id').get(getUser)
 
-
-export default userRouter
+export default router

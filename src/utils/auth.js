@@ -12,7 +12,6 @@ passport.use(adminStrategy())
 export const authenticate = passport.authenticate('local', { session: false })
 
 export const login = async (req, res, next) => {
-    console.log(req)
     const token = await sign({ username: req.user.username })
     res.cookie('jwt', token, { httpOnly: true })
     res.json({ success: true, token: token })
