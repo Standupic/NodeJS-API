@@ -17,10 +17,7 @@ app.use(json())
 app.use(urlencoded({ extended: true }))
 app.use(morgan('dev'))
 
-app.post('/login', authenticate, login)
-app.get('/', (req, res) => {
-  res.send('You are stupid')
-})
+app.post('/api/admin', authenticate, login)
 app.use('/api/user', UserRouter)
 app.use('/api/product', ProductRouter)
 

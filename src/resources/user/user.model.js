@@ -33,6 +33,12 @@ const userNameSchema = () => {
       {
         validator: str => !str.match(/^admin$/i),
         message: props => 'invalid username'
+      },
+      {
+        validator: function(username) {
+          return isUnique(this, username)
+        },
+        message: props => 'Username is taken'
       }
     ]
   }
