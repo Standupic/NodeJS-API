@@ -10,4 +10,6 @@ router.route('/:id').get(crudControllers(Product).getOne)
 
 router.route('/getMany').get(crudControllers(Product).getMany)
 
+router.route('/:id/updateOne').patch(crudControllers(Product).updateOne)
+
 export default router

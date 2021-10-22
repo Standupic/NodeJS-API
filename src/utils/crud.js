@@ -18,10 +18,11 @@ export const createOne = model => async (req, res) => {
 }
 
 export const updateOne = model => async (req, res) => {
+  console.log(req)
   const doc = await model.findOneAndUpdate(
     {
       _id: req.params.id,
-      createdBy: req.user._id
+      createdBy: req.query.createdBy
     },
     req.body,
     { new: true }
