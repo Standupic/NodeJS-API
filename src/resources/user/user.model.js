@@ -1,8 +1,9 @@
 import mongoose from 'mongoose'
-import bcrypt from 'bcryptjs'
 import { isUnique } from '../../utils/user'
 import cuid from 'cuid'
-import { isEmail, isAlphanumeric } from 'validator'
+import { isAlphanumeric, isEmail } from 'validator'
+import bcrypt from 'bcryptjs'
+import { autoCatch } from '../../utils/autoCatch'
 
 const SALT_ROUNDS = 10
 
@@ -45,6 +46,34 @@ const userNameSchema = () => {
   }
 }
 
+export const get = async username => {
+  return User.findOne({ username })
+}
+
+export const edit = async (username, change) => {
+  const user = await get(username)
+  Object.keys(change).forEach(key => {
+    user[key] = change[key]
+  })
+  if (change.password) await hashPassword(user)
+  await user.save()
+  return user
+}
+
+export const create = async fields => {
+  const user = new User(fields)
+  await hashPassword(user)
+  await user.save()
+  return user
+}
+
+const hashPassword = async user => {
+  if (!user.password) throw user.invalidate('password', 'password is required')
+  if (user.password.length < 12)
+    throw user.invalidate('password', 'password must be at least 12 characters')
+  user.password = await bcrypt.hash(user.password, SALT_ROUNDS)
+}
+
 const userSchema = new mongoose.Schema(
   {
     _id: { type: String, default: cuid },
@@ -55,32 +84,11 @@ const userSchema = new mongoose.Schema(
   { timestamps: true }
 )
 
-/* userSchema.pre('save', function(next) {
-  if (!this.isModified('password')) {
-    return next()
-  }
-
-  bcrypt.hash(this.password, 8, (err, hash) => {
-    if (err) {
-      return next(err)
-    }
-
-    this.password = hash
-    next()
-  })
-})
-
-userSchema.methods.checkPassword = function(password) {
-  const passwordHash = this.password
-  return new Promise((resolve, reject) => {
-    bcrypt.compare(password, passwordHash, (err, same) => {
-      if (err) {
-        return reject(err)
-      }
-
-      resolve(same)
-    })
-  })
-} */
-
 export const User = mongoose.model('user', userSchema)
+
+export const UserModel = autoCatch({
+  get,
+  edit,
+  create,
+  model: User
+})

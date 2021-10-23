@@ -1,33 +1,36 @@
 import jwt from 'jsonwebtoken'
 import passport from 'passport'
 import { Strategy } from 'passport-local'
-import autoCatch from './autoCatch'
+import { UserModel } from '../resources/user/user.model'
+import bcrypt from 'bcryptjs'
 
 const jwtSecret = process.env.JWT_SECRET || 'mark it zero'
 const adminPassword = process.env.ADMIN_PASSWORD || 'iamthewalrus'
 const jwtOpts = { algorithm: 'HS256', expiresIn: '30d' }
 
-// passport.use(adminStrategy())
+passport.use(adminStrategy())
 
-export const authenticate = passport.authenticate('local', { session: false })
+const authenticate = passport.authenticate('local', { session: false })
 
-export const login = async (req, res, next) => {
+const login = async (req, res, next) => {
   const token = await sign({ username: req.user.username })
   res.cookie('jwt', token, { httpOnly: true })
   res.json({ success: true, token: token })
 }
 
-async function ensureAdmin(req, res, next) {
+const ensureUser = async (req, res, next) => {
   const jwtString = req.headers.authorization || req.cookies.jwt
   const payload = await verify(jwtString)
-  if (payload.username === 'admin') return next()
+  if (payload.username === 'admin') {
+    if (req.user.username === 'admin') req.isAdmin = true
+    return next()
+  }
   const err = new Error('Unauthorized')
   err.statusCode = 401
   next(err)
 }
 
 async function sign(payload) {
-  console.log(payload, 'payload')
   return jwt.sign(payload, jwtSecret, jwtOpts)
 }
 
@@ -42,9 +45,22 @@ async function verify(jwtString = '') {
 }
 
 function adminStrategy() {
-  return new Strategy(function(username, password, cb) {
+  return new Strategy(async function(username, password, cb) {
     const isAdmin = username === 'admin' && password === adminPassword
     if (isAdmin) return cb(null, { username: 'admin' })
+    try {
+      const user = UserModel.get(username)
+      const isUser = await bcrypt.compare(password, user.password)
+      if (isUser) return cb(null, { username: user.username })
+    } catch (e) {
+      cb(null, false)
+    }
     cb(null, false)
   })
+}
+
+module.exports = {
+  ensureUser,
+  authenticate,
+  login
 }

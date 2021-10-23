@@ -7,7 +7,7 @@ import config from './config'
 import { notFound, handleError } from './middleware/handle.error'
 import UserRouter from './resources/user/user.router'
 import ProductRouter from './resources/product/product.router'
-import { login, authenticate } from './utils/auth'
+import auth from './utils/auth'
 
 export const app = express()
 app.disable('x-powered-by')
@@ -17,7 +17,7 @@ app.use(json())
 app.use(urlencoded({ extended: true }))
 app.use(morgan('dev'))
 
-app.post('/api/admin', authenticate, login)
+app.post('/api/auth', auth.authenticate, auth.login)
 app.use('/api/user', UserRouter)
 app.use('/api/product', ProductRouter)
 

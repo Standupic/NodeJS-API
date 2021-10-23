@@ -1,14 +1,15 @@
-import { User } from './user.model'
+import { create, edit, get, User, UserModel } from './user.model'
 import http from 'http'
+import { autoCatch } from '../../utils/autoCatch'
 
-export const createUser = async (req, res, next) => {
-  const user = await User.create(req.body)
+const createUser = async (req, res, next) => {
+  const user = await UserModel.create(req.body)
   const { username, email, _id } = user
   res.json({ username, email, _id })
 }
 
-export const getUser = async (req, res, next) => {
-  const user = await User.findOne({ _id: req.params.id }).exec()
+const getUser = async (req, res, next) => {
+  const user = await UserModel.findOne({ _id: req.params.id }).exec()
   if (!user) {
     return res.status(400).json({ error: http.STATUS_CODES[400] })
   }
@@ -34,3 +35,8 @@ export const updateMe = async (req, res) => {
     res.status(400).end()
   }
 }
+
+export const UserController = autoCatch({
+  createUser
+})
+

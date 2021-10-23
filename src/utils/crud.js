@@ -1,4 +1,4 @@
-import autoCatch from '../utils/autoCatch'
+import { autoCatch } from '../utils/autoCatch'
 
 export const getOne = model => async (req, res) => {
   const id = req.params.id
