@@ -1,7 +1,8 @@
 import mongoose from 'mongoose'
 import bcrypt from 'bcryptjs'
+import { isUnique } from '../../utils/user'
 import cuid from 'cuid'
-const { isEmail, isAlphanumeric } = require('validator')
+import { isEmail, isAlphanumeric } from 'validator'
 
 const SALT_ROUNDS = 10
 

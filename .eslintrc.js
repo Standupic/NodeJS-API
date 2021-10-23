@@ -15,6 +15,7 @@ module.exports = {
   plugins: ['prettier', 'jest'],
   rules: {
     'promise/catch-or-return': 'error',
+    'no-unused-vars': ['warn', { "vars": "all", "args": "after-used", "ignoreRestSiblings": false }], 
     'prettier/prettier': [
       'error',
       {
