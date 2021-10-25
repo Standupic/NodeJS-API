@@ -1,11 +1,14 @@
-import { create, edit, get, User, UserModel } from './user.model'
+import { User, UserModel } from './user.model'
 import http from 'http'
-import { autoCatch } from '../../utils/autoCatch'
 
-const createUser = async (req, res, next) => {
-  const user = await UserModel.create(req.body)
-  const { username, email, _id } = user
-  res.json({ username, email, _id })
+const createUser = async (req, res) => {
+  try {
+    const user = await UserModel.create(req.body)
+    const { username, email, _id } = user
+    res.json({ username, email, _id })
+  } catch (e) {
+    res.status(500).json({ error: e.message })
+  }
 }
 
 const getUser = async (req, res, next) => {
@@ -36,7 +39,6 @@ export const updateMe = async (req, res) => {
   }
 }
 
-export const UserController = autoCatch({
+export const UserController = {
   createUser
-})
-
+}

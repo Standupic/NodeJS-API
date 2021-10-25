@@ -1,23 +1,32 @@
 import { autoCatch } from '../utils/autoCatch'
 
-export const getOne = model => async (req, res) => {
+export const getOne = model => async (req, res, next) => {
   const id = req.params.id
   const userId = req.query.createdBy
   const doc = await model.findOne({ _id: id, createdBy: userId })
+  if (!doc) {
+    return next()
+  }
   res.status(200).json({ data: doc })
 }
 
-export const getMany = model => async (req, res) => {
+export const getMany = model => async (req, res, next) => {
   const doc = await model.find({ createdBy: req.query.createdBy })
+  if (!doc) {
+    return next()
+  }
   res.status(200).json({ data: doc })
 }
 
-export const createOne = model => async (req, res) => {
+export const createOne = model => async (req, res, next) => {
   const doc = await model.create({ ...req.body, createdBy: req.body.createdBy })
+  if (!doc) {
+    return next()
+  }
   res.status(200).json({ data: doc })
 }
 
-export const updateOne = model => async (req, res) => {
+export const updateOne = model => async (req, res, next) => {
   const doc = await model.findOneAndUpdate(
     {
       _id: req.params.id,
@@ -26,16 +35,22 @@ export const updateOne = model => async (req, res) => {
     req.body,
     { new: true }
   )
+  if (!doc) {
+    return next()
+  }
   res.status(200).json({ data: doc })
 }
 
-export const removeOne = model => async (req, res) => {
+export const removeOne = model => async (req, res, next) => {
   const doc = await model
     .findOneAndRemove({
       _id: req.params.id,
       createdBy: req.query.createdBy
     })
     .exec()
+  if (!doc) {
+    return next()
+  }
   res.status(200).json({ data: doc })
 }
 

@@ -69,8 +69,8 @@ export const create = async fields => {
 
 const hashPassword = async user => {
   if (!user.password) throw user.invalidate('password', 'password is required')
-  if (user.password.length < 12)
-    throw user.invalidate('password', 'password must be at least 12 characters')
+  if (user.password.length < 8)
+    throw user.invalidate('password', 'password must be at least 8 characters')
   user.password = await bcrypt.hash(user.password, SALT_ROUNDS)
 }
 
@@ -86,9 +86,9 @@ const userSchema = new mongoose.Schema(
 
 export const User = mongoose.model('user', userSchema)
 
-export const UserModel = autoCatch({
+export const UserModel = {
   get,
   edit,
   create,
   model: User
-})
+}

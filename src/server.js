@@ -31,6 +31,6 @@ export const start = async () => {
       console.log(`REST API on http://localhost:${config.port}/api`)
     })
   } catch (e) {
-    console.log(e)
+    // console.log(e)
   }
 }

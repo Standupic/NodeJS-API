@@ -49,13 +49,12 @@ function adminStrategy() {
     const isAdmin = username === 'admin' && password === adminPassword
     if (isAdmin) return cb(null, { username: 'admin' })
     try {
-      const user = UserModel.get(username)
+      const user = await UserModel.get(username)
       const isUser = await bcrypt.compare(password, user.password)
       if (isUser) return cb(null, { username: user.username })
     } catch (e) {
       cb(null, false)
     }
-    cb(null, false)
   })
 }
 
