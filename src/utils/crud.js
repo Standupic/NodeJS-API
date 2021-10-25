@@ -10,8 +10,16 @@ export const getOne = model => async (req, res, next) => {
   res.status(200).json({ data: doc })
 }
 
-export const getMany = model => async (req, res, next) => {
+export const getManyCreatedBy = model => async (req, res, next) => {
   const doc = await model.find({ createdBy: req.query.createdBy })
+  if (!doc) {
+    return next()
+  }
+  res.status(200).json({ data: doc })
+}
+
+export const getMany = model => async (req, res, next) => {
+  const doc = await model.find()
   if (!doc) {
     return next()
   }
@@ -58,7 +66,8 @@ export const crudControllers = model =>
   autoCatch({
     removeOne: removeOne(model),
     updateOne: updateOne(model),
-    getMany: getMany(model),
+    getManyCreatedBy: getManyCreatedBy(model),
     getOne: getOne(model),
-    createOne: createOne(model)
+    createOne: createOne(model),
+    getMany: getMany(model)
   })

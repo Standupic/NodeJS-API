@@ -3,7 +3,6 @@ import { isUnique } from '../../utils/user'
 import cuid from 'cuid'
 import { isAlphanumeric, isEmail } from 'validator'
 import bcrypt from 'bcryptjs'
-import { autoCatch } from '../../utils/autoCatch'
 
 const SALT_ROUNDS = 10
 

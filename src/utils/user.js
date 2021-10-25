@@ -1,8 +1,7 @@
 import { User } from '../resources/user/user.model'
 
 export const getOne = async username => {
-  const user = await User.findOne({ username })
-  return user
+  return User.findOne({ username })
 }
 
 export const isUnique = async (doc, username) => {

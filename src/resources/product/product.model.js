@@ -14,8 +14,7 @@ const productSchema = new mongoose.Schema(
     tags: { type: [String], index: true },
     createdBy: {
       type: String,
-      ref: 'User',
-      required: true
+      ref: 'User'
     }
   },
   { timestamps: true }
